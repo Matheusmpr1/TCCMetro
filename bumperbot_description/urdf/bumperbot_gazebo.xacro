@@ -1,0 +1,43 @@
+<?xml version="1.0"?> 
+<robot name="bumperbot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <gazebo>
+        <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+            <render_engine>ogre2</render_engine>
+        </plugin>
+
+        <xacro:if value="$(arg is_ignition)">
+            <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnRos2ControlSystem">
+                <parameters>$(find bumperbot_controller)/config/bumperbot_controllers.yaml</parameters>
+            </plugin>
+        </xacro:if>
+        <xacro:unless value="$(arg is_ignition)">
+            <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+                 <parameters>$(find bumperbot_controller)/config/bumperbot_controllers.yaml</parameters>
+            </plugin>
+        </xacro:unless>
+    </gazebo>
+
+    <gazebo reference="laser_frame">
+        <sensor name="vlp16_sensor" type="gpu_lidar"> 
+            <gz_frame_id>laser_frame</gz_frame_id>
+            <always_on>true</always_on>
+            <visualize>true</visualize> 
+            <update_rate>10</update_rate>
+            <topic>scan</topic>
+            <lidar>
+                <scan>
+                    <horizontal>
+                        <samples>360</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-3.14159</min_angle>
+                        <max_angle>3.14159</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.1</min> <max>30.0</max>
+                </range>
+            </lidar>
+        </sensor>
+    </gazebo>
+</robot>
